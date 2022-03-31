@@ -2,6 +2,20 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const methodOverride = require("method-override");
+const mongoose = require("mongoose");
+
+/* Connect Database */
+mongoose.connect("mongodb://localhost:27017/campgroundProject", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("Connected to DB");
+  })
+  .catch(err => {
+    console.log("Connection error");
+    console.log(err);
+  })
 
 /* CONFIG */
 app.set("view engine", "ejs");
