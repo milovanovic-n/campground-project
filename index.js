@@ -43,11 +43,11 @@ app.get("/", (req, res) => {
 //-all
 app.get("/campgrounds", async (req, res) => {
   const campgrounds = await Campground.find({});
-  res.render("campgrounds/index", {campgrounds})
+  res.render("campgrounds/index", {campgrounds, titleName: "Campgrounds"})
 })
 //-show form to add new
 app.get("/campgrounds/new", (req, res) => {
-  res.render("campgrounds/new");
+  res.render("campgrounds/new", {titleName: "Add Campground"});
 })
 //-add new
 app.post("/campgrounds", async(req, res) => {
@@ -63,13 +63,13 @@ app.post("/campgrounds", async(req, res) => {
 app.get("/campgrounds/:id", async (req, res) => {
   const {id} = req.params
   const camp = await Campground.findById(id);
-  res.render("campgrounds/show", {camp})
+  res.render("campgrounds/show", {camp, titleName: camp.title})
 })
 //-show form to edit a campground
 app.get("/campgrounds/:id/edit", async(req, res) => {
   const {id} = req.params
   const camp = await Campground.findById(id);
-  res.render("campgrounds/edit", {camp})
+  res.render("campgrounds/edit", {camp, titleName: `Edit ${camp.title}`})
 })
 //-edit the campground
 app.put("/campgrounds/:id", async(req, res) => {
