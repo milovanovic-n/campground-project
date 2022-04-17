@@ -1,9 +1,8 @@
 const express = require("express");
-const app = express();
 const path = require("path");
+const mongoose = require("mongoose");
 const engine = require("ejs-mate");
 const methodOverride = require("method-override");
-const mongoose = require("mongoose");
 const Campground = require("./models/campground");
 
 /* Connect Database */
@@ -18,6 +17,8 @@ mongoose.connect("mongodb://localhost:27017/campgroundProject", {
     console.log("Connection error");
     console.log(err);
   })
+
+  const app = express();
 
 /* CONFIG */
 app.engine("ejs", engine);
@@ -46,21 +47,25 @@ app.get("/campgrounds", async (req, res) => {
   res.render("campgrounds/index", {campgrounds, titleName: "Campgrounds"})
 })
 //-show form to add new
-app.get("/campgrounds/new", (req, res) => {
+app.get("/campgrounds/new", (req, res, next) => {
   res.render("campgrounds/new", {titleName: "Add Campground"});
 })
 //-add new
 app.post("/campgrounds", async(req, res) => {
-  const {campground: {title, location, price, description, image}} = req.body
-  const camp = new Campground({
-    title,
-    location,
-    image,
-    price,
-    description
-  })
-  await camp.save()
-  res.redirect(`/campgrounds/${camp._id}`);
+  try { 
+    const {campground: {title, location, price, description, image}} = req.body
+    const camp = new Campground({
+      title,
+      location,
+      image,
+      price,
+      description
+    })
+    await camp.save()
+    res.redirect(`/campgrounds/${camp._id}`);
+  } catch(e) {
+    next(e)
+  }
 })
 //-one
 app.get("/campgrounds/:id", async (req, res) => {
@@ -83,8 +88,15 @@ app.put("/campgrounds/:id", async(req, res) => {
 //-delete campground
 app.delete("/campgrounds/:id", async(req, res) => {
   const {id} = req.params;
+  console.log("************************")
+  console.log(id)
+  console.log("**************************")
   await Campground.findByIdAndDelete(id);
   res.redirect("/campgrounds");
+});
+
+app.use((err, req, res, next) => {
+  res.send("something went wrong")
 })
 
 
