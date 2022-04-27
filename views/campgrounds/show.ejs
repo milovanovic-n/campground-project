@@ -22,7 +22,7 @@
         </div>
       </div>
       <h2>Leave a Review</h2>
-      <form action="/campgrounds/<%= camp._id %>/reviews" class="mb-3 needs-validation" method="POST" novalidate>
+      <form action="/campgrounds/<%=camp._id%>/reviews" class="mb-3 needs-validation" method="POST" novalidate>
         <div class="mb-3">
           <label class="form-label" for="rating">Rating</label>
           <input class="form-range" type="range" min="1" max="5" id="rating" name="review[rating]">
@@ -36,5 +36,9 @@
         </div>
         <button type="submit" class="btn btn-success">Submit</button>
       </form>
+      <% for(let review of camp.reviews) { %>
+        <p><%= review.body %> </p>
+        <p><%= review.rating %> </p>
+      <% } %> 
     </div>
   </div>
