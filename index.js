@@ -8,6 +8,7 @@ const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground");
 const Review = require("./models/review");
+const campgroundRoutes = require("./routes/campgrounds");
 
 /* Connect Database */
 mongoose.connect("mongodb://localhost:27017/campgroundProject", {
@@ -37,15 +38,6 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 
 //VALIDATIONS --Joi--
-const validateCampground = (req, res, next) => {
-  const {error} = campgroundSchema.validate(req.body);
-  if(error) {
-    const msg = error.details.map(el => el.message).join(",");
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
 
 const validateReview = (req, res, next) => {
   const {error} = reviewSchema.validate(req.body);
@@ -64,46 +56,7 @@ app.get("/", (req, res) => {
 })
 
 /* Campgrounds */
-//-all
-app.get("/campgrounds", catchAsync( async (req, res, next) => {
-  const campgrounds = await Campground.find({});
-  res.render("campgrounds/index", {campgrounds, titleName: "Campgrounds"})
-}));
-//-show form to add new
-app.get("/campgrounds/new", (req, res) => {
-  res.render("campgrounds/new", {titleName: "Add Campground"});
-})
-//-add new
-app.post("/campgrounds", validateCampground, catchAsync( async(req, res, next) => {
-  //if(!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
-  const camp = new Campground(req.body.campground)
-  await camp.save()
-  res.redirect(`/campgrounds/${camp._id}`);
-}));
-//-one
-app.get("/campgrounds/:id", catchAsync(async (req, res, next) => {
-  const {id} = req.params
-  const camp = await Campground.findById(id).populate("reviews");
-  res.render("campgrounds/show", {camp, titleName: camp.title})
-}))
-//-show form to edit a campground
-app.get("/campgrounds/:id/edit", catchAsync( async(req, res, next) => {
-  const {id} = req.params
-  const camp = await Campground.findById(id);
-  res.render("campgrounds/edit", {camp, titleName: `Edit ${camp.title}`})
-}));
-//-edit the campground
-app.put("/campgrounds/:id", validateCampground, catchAsync( async(req, res, next) => {
-  const {id} = req.params;
-  const camp = await Campground.findByIdAndUpdate(id, {...req.body.campground});
-  res.redirect(`/campgrounds/${id}`);
-}));
-//-delete campground
-app.delete("/campgrounds/:id", catchAsync( async(req, res, next) => {
-  const {id} = req.params;
-  await Campground.findByIdAndDelete(id);
-  res.redirect("/campgrounds");
-}));
+app.use("/campgrounds", campgroundRoutes)
 
 // REVIEWS
 app.post("/campgrounds/:id/reviews", validateReview, catchAsync(async(req, res, next) =>{
