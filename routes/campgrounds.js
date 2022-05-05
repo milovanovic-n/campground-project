@@ -31,6 +31,7 @@ router.get("/new", isLoggedIn, (req, res) => {
 router.post("/", isLoggedIn, validateCampground, catchAsync( async(req, res, next) => {
   //if(!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
   const camp = new Campground(req.body.campground)
+  camp.author = req.user._id;
   await camp.save();
   req.flash("success", "Successfully made a new Campground");
   res.redirect(`/campgrounds/${camp._id}`);
@@ -38,7 +39,7 @@ router.post("/", isLoggedIn, validateCampground, catchAsync( async(req, res, nex
 //-one
 router.get("/:id", catchAsync(async (req, res, next) => {
   const {id} = req.params
-  const camp = await Campground.findById(id).populate("reviews");
+  const camp = await Campground.findById(id).populate("reviews").populate("author");
   // if no Campground flash error message and redirect
   if(!camp) {
     req.flash("error", "Campground not found!");
