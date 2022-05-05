@@ -9,13 +9,16 @@ router.get("/register", (req, res) => {
   res.render("users/register", {titleName: "Register"});
 });
 // Submit registration form
-router.post("/register", catchAsync(async(req, res) => {
+router.post("/register", catchAsync(async(req, res, next) => {
   try {
     const {username, email, password} = req.body;
     const user = new User({username, email});
     const registredUser = await User.register(user, password);
-    req.flash("success", "Welcome to Deer Camp");
-    res.redirect("/campgrounds");
+    req.login(registredUser, err => {
+      if(err) return next(err)
+      req.flash("success", "Welcome to Deer Camp");
+      res.redirect("/campgrounds");
+    })
   } catch(e) {
     req.flash("error", e.message);
     res.redirect("/register");
