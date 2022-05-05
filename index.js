@@ -6,11 +6,13 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
-const campgroundRoutes = require("./routes/campgrounds");
-const reviewRoutes = require("./routes/reviews");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
+
+const campgroundRoutes = require("./routes/campgrounds");
+const reviewRoutes = require("./routes/reviews");
+const userRoutes = require("./routes/users");
 
 /* Connect Database */
 mongoose.connect("mongodb://localhost:27017/campgroundProject", {
@@ -71,15 +73,12 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
   res.render("home.ejs", {titleName: "Home"});
 });
-app.get("/fake", async (req, res) => {
-  const user = new User({email: "neno@gmail.com", username: "Neno"});
-  const newUser = await User.register(user, "nenoneno");
-  res.send(newUser)
-})
-/* CAMPGROUNDS */
+/* CAMPGROUND Routes */
 app.use("/campgrounds", campgroundRoutes);
-/* REVIEWS */
+/* REVIEW Routes */
 app.use("/campgrounds/:id/reviews", reviewRoutes);
+// USER Routes
+app.use("/", userRoutes);
 
 
 app.all("*", (req, res, next) => {
