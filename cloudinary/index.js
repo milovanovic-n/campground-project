@@ -9,8 +9,10 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  folder: "DeerCamp",
-  allowedFormats: ["jpeg", "png", "jpg"]
+  params: {
+    folder: "DeerCamp",
+    allowedFormats: ["jpeg", "png", "jpg"]
+  }
 });
 
 module.exports = {
